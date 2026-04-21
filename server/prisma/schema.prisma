@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  email         String          @unique
+  password      String?
+  image         String?
+  homeAddress   String?
+  workAddress   String?
+  phone         String?
+  emergencyContacts String[]
+  monthlyBudget Float           @default(0)
+  darkMode      Boolean         @default(false)
+  emailVerified Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  accounts      Account[]
+  trips         Trip[]
+  favorites     FavoriteRoute[]
+  refreshTokens RefreshToken[]
+  resetTokens   PasswordResetToken[]
+  verifyTokens  EmailVerificationToken[]
+  sosIncidents  SOSIncident[]
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  provider          String
+  providerAccountId String
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Trip {
+  id            String    @id @default(cuid())
+  userId        String
+  origin        String
+  destination   String
+  transportType String
+  fare          Float
+  travelTime    Int
+  tripDate      DateTime
+  notes         String?
+  receipt       Receipt?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Receipt {
+  id           String   @id @default(cuid())
+  tripId       String   @unique
+  imageUrl     String
+  cloudinaryId String
+  uploadedAt   DateTime @default(now())
+  trip         Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model FavoriteRoute {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  origin        String
+  destination   String
+  estimatedCost Float
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SOSIncident {
+  id            String   @id @default(cuid())
+  userId        String
+  latitude      Float
+  longitude     Float
+  transportType String
+  transportPlate String?
+  status        String   @default("active")
+  triggeredAt   DateTime @default(now())
+  resolvedAt    DateTime?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

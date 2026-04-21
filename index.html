@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#042C53" />
+  <title>ByaHero Brief Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to content</a>
+
+  <header class="hero" role="banner">
+    <div class="hero__bg-shape hero__bg-shape--1" aria-hidden="true"></div>
+    <div class="hero__bg-shape hero__bg-shape--2" aria-hidden="true"></div>
+    <div class="container hero__content">
+      <p class="eyebrow">Commuter App Planning Form</p>
+      <h1>
+        ByaHero <span>Brief Builder</span>
+      </h1>
+      <p class="subtitle">
+        Witty, mabilis tandaan, at ready for AI: “Mula ideya to launch, isang hero form lang.”
+      </p>
+      <p class="tagline">Bawat commuter, bayani ng sariling byahe.</p>
+    </div>
+  </header>
+
+  <main id="mainContent" class="container main" tabindex="-1">
+    <section class="progress-card" aria-label="Form completion status">
+      <div class="progress-row">
+        <h2>Form Progress</h2>
+        <output id="progressText" for="projectForm">0%</output>
+      </div>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="progressText">
+        <div id="progressBar" class="progress__bar"></div>
+      </div>
+      <p class="muted">Live update habang pinupunan mo ang bawat section.</p>
+    </section>
+
+    <form id="projectForm" novalidate>
+      <section class="card" aria-labelledby="sec-project-overview">
+        <h3 id="sec-project-overview">1. Project Overview</h3>
+        <div class="grid two">
+          <div class="field">
+            <label for="projectName">Project / App Name <span aria-hidden="true">*</span></label>
+            <input id="projectName" name="projectName" type="text" required maxlength="60" placeholder="ByaHero" />
+            <small class="error" id="projectNameError" aria-live="polite"></small>
+          </div>
+          <div class="field">
+            <label for="email">Contact Email <span aria-hidden="true">*</span></label>
+            <input id="email" name="email" type="email" required placeholder="name@email.com" />
+            <small class="error" id="emailError" aria-live="polite"></small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="role">Your Role <span aria-hidden="true">*</span></label>
+          <select id="role" name="role" required>
+            <option value="">Select role</option>
+            <option>Founder</option>
+            <option>Product Manager</option>
+            <option>Designer</option>
+            <option>Developer</option>
+            <option>Operations</option>
+            <option>Student Builder</option>
+            <option>Other</option>
+          </select>
+          <small class="error" id="roleError" aria-live="polite"></small>
+        </div>
+
+        <div class="field">
+          <label for="vision">Vision Statement <span aria-hidden="true">*</span></label>
+          <textarea id="vision" name="vision" rows="4" required maxlength="280" placeholder="Ano ang mission ng app mo para sa commuters?"></textarea>
+          <div class="field-footer">
+            <small class="error" id="visionError" aria-live="polite"></small>
+            <small class="counter" id="visionCount">0/280</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="sec-target-users">
+        <h3 id="sec-target-users">2. Target Users</h3>
+        <div class="grid two">
+          <div class="field">
+            <label for="userGroup">Primary User Group <span aria-hidden="true">*</span></label>
+            <input id="userGroup" name="userGroup" type="text" required maxlength="80" placeholder="Daily city commuters" />
+            <small class="error" id="userGroupError" aria-live="polite"></small>
+          </div>
+          <div class="field">
+            <label for="ageRange">Age Range <span aria-hidden="true">*</span></label>
+            <select id="ageRange" name="ageRange" required>
+              <option value="">Select age range</option>
+              <option>13-17</option>
+              <option>18-24</option>
+              <option>25-34</option>
+              <option>35-44</option>
+              <option>45-54</option>
+              <option>55+</option>
+              <option>Mixed</option>
+            </select>
+            <small class="error" id="ageRangeError" aria-live="polite"></small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="painPoints">Top Pain Points <span aria-hidden="true">*</span></label>
+          <textarea id="painPoints" name="painPoints" rows="4" required maxlength="400" placeholder="Traffic? mahal na pamasahe? commute uncertainty?"></textarea>
+          <div class="field-footer">
+            <small class="error" id="painPointsError" aria-live="polite"></small>
+            <small class="counter" id="painPointsCount">0/400</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="sec-core-features">
+        <h3 id="sec-core-features">3. Core Features</h3>
+        <p class="muted">Pick at least 3 core features.</p>
+
+        <div class="chips-grid" role="group" aria-label="Core features">
+          <label class="chip"><input type="checkbox" name="features" value="Trip Logging" />Trip Logging</label>
+          <label class="chip"><input type="checkbox" name="features" value="Route Timeline" />Route Timeline</label>
+          <label class="chip"><input type="checkbox" name="features" value="Fare Tracker" />Fare Tracker</label>
+          <label class="chip"><input type="checkbox" name="features" value="Expense Dashboard" />Expense Dashboard</label>
+          <label class="chip"><input type="checkbox" name="features" value="Photo Receipt Log" />Photo Receipt Log</label>
+          <label class="chip"><input type="checkbox" name="features" value="WFH Savings Calculator" />WFH Savings Calculator</label>
+          <label class="chip"><input type="checkbox" name="features" value="Transport Mode Colors" />Transport Mode Colors</label>
+          <label class="chip"><input type="checkbox" name="features" value="Export Reports" />Export Reports</label>
+          <label class="chip"><input type="checkbox" name="features" value="Smart Suggestions" />Smart Suggestions</label>
+          <label class="chip"><input type="checkbox" name="features" value="Offline Draft Mode" />Offline Draft Mode</label>
+        </div>
+        <small class="error" id="featuresError" aria-live="polite"></small>
+
+        <div class="grid two">
+          <div class="field">
+            <label for="mvpPriority">MVP Priority <span aria-hidden="true">*</span></label>
+            <select id="mvpPriority" name="mvpPriority" required>
+              <option value="">Pick priority</option>
+              <option>Speed to launch</option>
+              <option>Accuracy of tracking</option>
+              <option>User growth</option>
+              <option>Automation via AI</option>
+              <option>Revenue first</option>
+            </select>
+            <small class="error" id="mvpPriorityError" aria-live="polite"></small>
+          </div>
+
+          <div class="field">
+            <label for="featureTagInput">Custom Feature Tags</label>
+            <input id="featureTagInput" type="text" placeholder="type + Enter or comma" aria-describedby="featureTagHint" />
+            <small id="featureTagHint" class="muted">Example: Jeepney crowd predictor</small>
+            <div id="tagList" class="tag-list" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="sec-design-tech">
+        <h3 id="sec-design-tech">4. Design & Tech</h3>
+
+        <fieldset class="field">
+          <legend>Platform Target <span aria-hidden="true">*</span></legend>
+          <div class="radio-row" role="radiogroup" aria-label="Platform target">
+            <label class="radio"><input type="radio" name="platform" value="Web" required />Web</label>
+            <label class="radio"><input type="radio" name="platform" value="Mobile Web" required />Mobile Web</label>
+            <label class="radio"><input type="radio" name="platform" value="Web + Mobile" required />Web + Mobile</label>
+          </div>
+          <small class="error" id="platformError" aria-live="polite"></small>
+        </fieldset>
+
+        <div class="grid two">
+          <div class="field">
+            <label for="techStack">Preferred Tech Stack <span aria-hidden="true">*</span></label>
+            <input id="techStack" name="techStack" type="text" required maxlength="120" placeholder="React + Supabase + Node" />
+            <small class="error" id="techStackError" aria-live="polite"></small>
+          </div>
+
+          <div class="field">
+            <label for="designVibe">Design Vibe <span aria-hidden="true">*</span></label>
+            <select id="designVibe" name="designVibe" required>
+              <option value="">Select vibe</option>
+              <option>Bold + Street-inspired</option>
+              <option>Clean + Trustworthy</option>
+              <option>Playful + Community</option>
+              <option>Data-heavy + Professional</option>
+            </select>
+            <small class="error" id="designVibeError" aria-live="polite"></small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="complexity">Complexity Level: <output id="complexityOut">3</output></label>
+          <input id="complexity" name="complexity" type="range" min="1" max="5" step="1" value="3" />
+          <small class="muted">1 = quick MVP, 5 = full ecosystem</small>
+        </div>
+
+        <div class="field">
+          <label for="integrations">Integrations Needed</label>
+          <textarea id="integrations" name="integrations" rows="3" maxlength="240" placeholder="Maps API, analytics, reimbursement system"></textarea>
+          <div class="field-footer">
+            <span></span>
+            <small class="counter" id="integrationsCount">0/240</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="sec-business">
+        <h3 id="sec-business">5. Business Model</h3>
+
+        <div class="grid two">
+          <div class="field">
+            <label for="monetization">Monetization Strategy <span aria-hidden="true">*</span></label>
+            <select id="monetization" name="monetization" required>
+              <option value="">Select strategy</option>
+              <option>Freemium</option>
+              <option>Subscription</option>
+              <option>B2B partnerships</option>
+              <option>Ads + affiliate</option>
+              <option>Mixed model</option>
+            </select>
+            <small class="error" id="monetizationError" aria-live="polite"></small>
+          </div>
+
+          <div class="field">
+            <label for="budget">Estimated Budget (PHP) <span aria-hidden="true">*</span></label>
+            <input id="budget" name="budget" inputmode="numeric" type="text" required placeholder="250000" />
+            <small class="error" id="budgetError" aria-live="polite"></small>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="field">
+            <label for="timeline">Target Timeline <span aria-hidden="true">*</span></label>
+            <select id="timeline" name="timeline" required>
+              <option value="">Pick timeline</option>
+              <option>2-4 weeks</option>
+              <option>1-2 months</option>
+              <option>3-4 months</option>
+              <option>5-6 months</option>
+              <option>6+ months</option>
+            </select>
+            <small class="error" id="timelineError" aria-live="polite"></small>
+          </div>
+
+          <div class="field">
+            <label for="competitors">Competitors / Similar Apps</label>
+            <input id="competitors" name="competitors" type="text" maxlength="150" placeholder="Sakay.ph, Moovit, Citymapper" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="sec-extra">
+        <h3 id="sec-extra">6. Karagdagang Info</h3>
+
+        <div class="field">
+          <label for="inspiration">Inspiration Apps / Sites</label>
+          <textarea id="inspiration" name="inspiration" rows="3" maxlength="220" placeholder="Links or names"></textarea>
+          <div class="field-footer">
+            <span></span>
+            <small class="counter" id="inspirationCount">0/220</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="uniqueAngle">Unique Angle <span aria-hidden="true">*</span></label>
+          <textarea id="uniqueAngle" name="uniqueAngle" rows="4" required maxlength="320" placeholder="Ano ang edge ng ByaHero na walang iba?"></textarea>
+          <div class="field-footer">
+            <small class="error" id="uniqueAngleError" aria-live="polite"></small>
+            <small class="counter" id="uniqueAngleCount">0/320</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="attachments">Attach Files (Optional, max 10MB each)</label>
+          <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-describedby="fileHint">
+            <p>Drag & drop files here or <span class="link">browse</span></p>
+            <input id="attachments" name="attachments" type="file" multiple hidden />
+          </div>
+          <small id="fileHint" class="muted">Fallback: if drag-drop fails, click the box to browse files.</small>
+          <small class="error" id="attachmentsError" aria-live="polite"></small>
+          <ul id="fileList" class="file-list" aria-live="polite"></ul>
+        </div>
+
+        <div class="field">
+          <label for="notes">Additional Notes</label>
+          <textarea id="notes" name="notes" rows="4" maxlength="300" placeholder="Anything else the AI builder should know?"></textarea>
+          <div class="field-footer">
+            <span></span>
+            <small class="counter" id="notesCount">0/300</small>
+          </div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button id="submitBtn" type="submit" class="btn btn-primary">
+          <span class="btn-text">Generate AI-Ready Brief</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+        <button id="resetBtn" type="button" class="btn btn-ghost">Reset Form</button>
+      </div>
+    </form>
+
+    <section id="successCard" class="success hidden" aria-live="polite" aria-atomic="true">
+      <h2>Hero Brief Ready</h2>
+      <p>Nabuo na ang complete brief mo. Pwede na itong i-feed sa AI team for build planning.</p>
+      <pre id="summaryBox"></pre>
+      <button id="newEntryBtn" class="btn btn-primary" type="button">Create Another Brief</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
