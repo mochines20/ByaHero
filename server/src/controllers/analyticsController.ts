@@ -24,6 +24,29 @@ export async function byTransport(req: Request, res: Response) {
   return res.json({ data });
 }
 
+export async function weekdaySpending(req: Request, res: Response) {
+  const user = (req as any).user;
+  const trips = await prisma.trip.findMany({ where: { userId: user.id } });
+  
+  const days = ["Linggo", "Lunes", "Martes", "Miyerkules", "Huwebes", "Biyernes", "Sabado"];
+  const spending = new Array(7).fill(0);
+  
+  trips.forEach((trip) => {
+    const dayIndex = trip.tripDate.getDay();
+    spending[dayIndex] += trip.fare;
+  });
+
+  const data = days.map((day, i) => ({
+    day,
+    total: spending[i],
+  }));
+
+  // Reorder to start with Lunes for Filipino context
+  const reordered = [...data.slice(1), data[0]];
+
+  return res.json({ data: reordered });
+}
+
 export async function wfhSavings(req: Request, res: Response) {
   const { wfhDays = 8, dailyCost = 120 } = req.query;
   const monthly = Number(wfhDays) * Number(dailyCost);

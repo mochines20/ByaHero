@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
+import { motion } from "framer-motion";
+import { Sparkles, Zap, ShieldCheck } from "lucide-react";
 
 type Feature = {
   id: string;
@@ -119,27 +121,58 @@ const features: Feature[] = [
 
 export function FeaturesPage() {
   return (
-    <div className="space-y-4">
-      <Card className="rounded-3xl">
-        <h1 className="text-xl font-bold text-byahero-navy sm:text-2xl">ByaHero Features</h1>
-        <p className="mt-1 text-sm text-byahero-muted">Each roadmap item has its own handler and place in the system.</p>
-      </Card>
+    <div className="space-y-8 pb-12">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col gap-2"
+      >
+        <div className="flex items-center gap-3">
+          <Sparkles className="text-byahero-yellow" size={28} />
+          <h2 className="font-brand text-4xl font-black text-white italic tracking-tighter uppercase">Mga Features</h2>
+        </div>
+        <p className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Bawat roadmap item, silyado para sa mga Hero.</p>
+      </motion.header>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {features.map((f) => (
-          <Card key={f.id} className="rounded-3xl">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-byahero-blue">#{f.id}</p>
-              <span className="rounded-full bg-byahero-light px-2 py-1 text-xs font-semibold text-byahero-navy">{f.priority}</span>
-            </div>
-            <h3 className="mt-2 font-semibold text-byahero-navy">{f.title}</h3>
-            <p className="mt-1 text-sm text-byahero-muted">{f.description}</p>
-            <div className="mt-3">
-              <Link to={f.to ?? "/features"} className="inline-flex min-h-10 items-center rounded-full bg-[#33b6ff] px-3 text-xs font-semibold text-white">
-                {f.actionLabel}
-              </Link>
-            </div>
-          </Card>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((f, idx) => (
+          <motion.div
+            key={f.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.05 }}
+          >
+            <Card className="group relative h-full flex flex-col justify-between overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all duration-300">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black tracking-tighter text-byahero-yellow italic">#{f.id}</span>
+                  <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 border border-white/10">
+                    {f.priority === "MVP" ? <Zap size={10} className="text-byahero-yellow" /> : <ShieldCheck size={10} className="text-white/40" />}
+                    <span className="text-[9px] font-black uppercase tracking-widest text-white">{f.priority}</span>
+                  </div>
+                </div>
+                
+                <h3 className="font-brand text-xl font-black text-white group-hover:text-byahero-yellow transition-colors leading-tight mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-sm font-bold text-white/60 leading-relaxed mb-6">
+                  {f.description}
+                </p>
+              </div>
+
+              <div className="mt-auto">
+                <Link 
+                  to={f.to ?? "/features"} 
+                  className="flex h-12 w-full items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-byahero-yellow hover:text-byahero-navy hover:shadow-yellow transition-all"
+                >
+                  {f.actionLabel}
+                </Link>
+              </div>
+
+              {/* Decorative Background Blur */}
+              <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-byahero-blue/10 blur-3xl group-hover:bg-byahero-yellow/10 transition-all" />
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>

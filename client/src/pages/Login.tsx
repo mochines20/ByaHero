@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+﻿import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { AuthLayout } from "../components/auth/AuthLayout";
@@ -9,10 +9,11 @@ import { Input } from "../components/ui/Input";
 import { api } from "../lib/api";
 import { useAuthStore } from "../store/authStore";
 import { useToastStore } from "../store/uiStore";
+import { motion } from "framer-motion";
 
 const schema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 chars"),
+  email: z.string().email("Ilagay ang tamang email"),
+  password: z.string().min(8, "Kailangan ng hindi bababa sa 8 characters"),
 });
 
 export function LoginPage() {
@@ -43,71 +44,93 @@ export function LoginPage() {
       setUser(data.user);
       navigate("/dashboard");
     } catch (err: any) {
-      pushToast(err.message || "Login failed");
+      pushToast(err.message || "Maling email o password");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Log in to track your daily commute hero moves.">
-      <form onSubmit={submit} className="space-y-3">
-        <div>
-          <label className="text-sm font-medium text-byahero-navy">Email</label>
-          <Input
-            type="email"
-            value={form.email}
-            error={errors.email}
-            onChange={(e) => {
-              const value = e.target.value;
-              setForm((s) => ({ ...s, email: value }));
-              setErrors((s) => ({ ...s, email: "" }));
-            }}
-            onBlur={() =>
-              schema.shape.email.safeParse(form.email.trim()).success
-                ? setErrors((s) => ({ ...s, email: "" }))
-                : setErrors((s) => ({ ...s, email: "Enter a valid email" }))
-            }
+    <AuthLayout 
+      title="Mabuhay, Hero!" 
+      subtitle="Handa ka na bang mag-byahe? Tara na!"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10"
+      >
+        <form onSubmit={submit} className="space-y-6">
+          <div className="space-y-1.5">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">Email Address</label>
+            <Input
+              type="email"
+              placeholder="juan@byahero.ph"
+              value={form.email}
+              error={errors.email}
+              onChange={(e) => {
+                const value = e.target.value;
+                setForm((s) => ({ ...s, email: value }));
+                setErrors((s) => ({ ...s, email: "" }));
+              }}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">Password</label>
+            <PasswordField
+              id="password"
+              placeholder="••••••••"
+              value={form.password}
+              error={errors.password}
+              onChange={(value) => {
+                setForm((s) => ({ ...s, password: value }));
+                setErrors((s) => ({ ...s, password: "" }));
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between px-1">
+            <label className="flex cursor-pointer items-center gap-2 text-xs font-bold text-white select-none">
+              <input 
+                type="checkbox" 
+                className="h-4 w-4 rounded border-white/20 bg-white/10 text-byahero-yellow focus:ring-byahero-yellow/20"
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)} 
+              />
+              Tandaan ako
+            </label>
+            <Link to="/forgot-password" title="Nakalimutan?" className="text-xs font-black text-byahero-yellow hover:underline transition-all">
+              Nakalimutan?
+            </Link>
+          </div>
+
+          <Button disabled={loading} className="w-full">
+            {loading ? "Sumasakay na..." : "Sumakay Na!"}
+          </Button>
+
+          <div className="relative py-2">
+            <div className="absolute inset-0 flex items-center opacity-20"><div className="w-full border-t border-white"></div></div>
+            <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest text-white/40">
+              <span className="bg-transparent px-2">O kaya naman sa</span>
+            </div>
+          </div>
+
+          <SocialButtons
+            disabled={loading}
+            onGoogle={() => (window.location.href = `${apiBaseUrl}/auth/google`)}
+            onApple={() => (window.location.href = `${apiBaseUrl}/auth/apple`)}
           />
-        </div>
 
-        <PasswordField
-          id="password"
-          label="Password"
-          value={form.password}
-          error={errors.password}
-          onChange={(value) => {
-            setForm((s) => ({ ...s, password: value }));
-            setErrors((s) => ({ ...s, password: "" }));
-          }}
-        />
-
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-byahero-muted">
-            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
-            Remember me (30 days)
-          </label>
-          <Link to="/forgot-password" className="text-sm text-byahero-blue">
-            Forgot Password?
-          </Link>
-        </div>
-
-        <Button disabled={loading} className="w-full">
-          {loading ? "Signing in..." : "Login"}
-        </Button>
-
-        <div className="my-1 text-center text-xs text-byahero-muted">- or continue with -</div>
-
-        <SocialButtons
-          disabled={loading}
-          onGoogle={() => (window.location.href = `${apiBaseUrl}/auth/google`)}
-          onApple={() => (window.location.href = `${apiBaseUrl}/auth/apple`)}
-        />
-
-        <p className="text-center text-sm text-byahero-muted">
-          No account yet? <Link className="text-byahero-blue" to="/register">Create one</Link>
-        </p>
-      </form>
+          <p className="text-center text-sm font-bold text-white/70">
+            Wala pang account?{" "}
+            <Link className="font-black text-byahero-yellow hover:scale-105 inline-block transition-transform" to="/register">
+              Maging Hero
+            </Link>
+          </p>
+        </form>
+      </motion.div>
     </AuthLayout>
   );
 }
+

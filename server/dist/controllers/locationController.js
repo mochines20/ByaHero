@@ -13,7 +13,11 @@ export const startLocationShare = async (req, res) => {
     try {
         const { recipientName, recipientPhone } = startShareSchema.parse(req.body);
         const userId = req.userId;
-        const share = await prisma.locationShare.create({
+        const locationShare = prisma.locationShare;
+        if (!locationShare) {
+            return res.status(501).json({ error: 'Location sharing is not configured in Prisma schema yet.' });
+        }
+        const share = await locationShare.create({
             data: {
                 userId,
                 recipientName,
@@ -33,13 +37,17 @@ export const updateLocation = async (req, res) => {
     try {
         const { shareId, latitude, longitude } = updateLocationSchema.parse(req.body);
         const userId = req.userId;
-        const share = await prisma.locationShare.findUnique({
+        const locationShare = prisma.locationShare;
+        if (!locationShare) {
+            return res.status(501).json({ error: 'Location sharing is not configured in Prisma schema yet.' });
+        }
+        const share = await locationShare.findUnique({
             where: { id: shareId }
         });
         if (!share || share.userId !== userId) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
-        await prisma.locationShare.update({
+        await locationShare.update({
             where: { id: shareId },
             data: {
                 lastLatitude: latitude,
@@ -58,13 +66,17 @@ export const stopLocationShare = async (req, res) => {
     try {
         const { shareId } = z.object({ shareId: z.string() }).parse(req.body);
         const userId = req.userId;
-        const share = await prisma.locationShare.findUnique({
+        const locationShare = prisma.locationShare;
+        if (!locationShare) {
+            return res.status(501).json({ error: 'Location sharing is not configured in Prisma schema yet.' });
+        }
+        const share = await locationShare.findUnique({
             where: { id: shareId }
         });
         if (!share || share.userId !== userId) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
-        await prisma.locationShare.update({
+        await locationShare.update({
             where: { id: shareId },
             data: { isActive: false, stoppedAt: new Date() }
         });
@@ -78,7 +90,11 @@ export const stopLocationShare = async (req, res) => {
 export const getActiveShares = async (req, res) => {
     try {
         const userId = req.userId;
-        const shares = await prisma.locationShare.findMany({
+        const locationShare = prisma.locationShare;
+        if (!locationShare) {
+            return res.json({ shares: [] });
+        }
+        const shares = await locationShare.findMany({
             where: { userId, isActive: true },
             orderBy: { startedAt: 'desc' }
         });

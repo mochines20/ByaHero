@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { AxiosHeaders } from "axios";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:4000/api",
@@ -31,8 +32,9 @@ api.interceptors.request.use(async (config) => {
 
   if (needsCsrf) {
     const token = await getCsrfToken();
-    config.headers = config.headers ?? {};
-    config.headers["x-csrf-token"] = token;
+    const headers = (config.headers ?? {}) as AxiosHeaders & Record<string, string>;
+    headers["x-csrf-token"] = token;
+    config.headers = headers;
   }
 
   return config;

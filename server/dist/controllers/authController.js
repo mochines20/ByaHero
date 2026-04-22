@@ -4,6 +4,12 @@ import { prisma } from "../lib/prisma";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import { sendEmail } from "../lib/email";
 import { env } from "../lib/env";
+const authUserSelect = {
+    id: true,
+    name: true,
+    email: true,
+    image: true,
+};
 function sha(input) {
     return crypto.createHash("sha256").update(input).digest("hex");
 }
@@ -25,7 +31,7 @@ function setAuthCookies(res, accessToken, refreshToken, rememberMe) {
 }
 export async function register(req, res) {
     const { name, email, password } = req.body;
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
     if (existing)
         return res.status(409).json({ message: "Email already in use" });
     const hashed = await bcrypt.hash(password, 12);
@@ -53,7 +59,10 @@ export async function register(req, res) {
 }
 export async function login(req, res) {
     const { email, password, rememberMe } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+        where: { email },
+        select: { ...authUserSelect, password: true },
+    });
     if (!user || !user.password)
         return res.status(401).json({ message: "Invalid credentials" });
     const isMatch = await bcrypt.compare(password, user.password);
@@ -91,7 +100,10 @@ export async function refresh(req, res) {
         if (!existing)
             return res.status(401).json({ message: "Invalid refresh token" });
         await prisma.refreshToken.update({ where: { id: existing.id }, data: { revoked: true } });
-        const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+        const user = await prisma.user.findUnique({
+            where: { id: payload.sub },
+            select: authUserSelect,
+        });
         if (!user)
             return res.status(401).json({ message: "Unauthorized" });
         const newAccess = signAccessToken({ sub: user.id, email: user.email });
@@ -128,7 +140,10 @@ export async function me(req, res) {
 }
 export async function forgotPassword(req, res) {
     const { email } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+        where: { email },
+        select: { ...authUserSelect },
+    });
     if (!user)
         return res.json({ message: "If email exists, reset link was sent." });
     const token = crypto.randomBytes(32).toString("hex");

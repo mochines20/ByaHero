@@ -14,10 +14,25 @@ import sosRoutes from './routes/sos';
 import receiptsRoutes from './routes/receipts';
 import tripsRoutes from './routes/trips';
 import usersRoutes from './routes/users';
+import plannerRoutes from "./routes/planner";
+import gtfsRoutes from "./routes/gtfs";
 export const app = express();
+const allowedOrigins = new Set([
+    env.CLIENT_URL,
+    env.NODE_ENV === "development" ? "http://localhost:5173" : null,
+    env.NODE_ENV === "development" ? "http://localhost:5174" : null,
+    env.NODE_ENV === "development" ? "http://127.0.0.1:5173" : null,
+    env.NODE_ENV === "development" ? "http://127.0.0.1:5174" : null,
+].filter(Boolean));
 app.use(helmet());
 app.use(cors({
-    origin: [env.CLIENT_URL],
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
 }));
 app.use(morgan('dev'));
@@ -42,4 +57,6 @@ app.use('/api/trips', csrfProtection, tripsRoutes);
 app.use('/api/receipts', csrfProtection, receiptsRoutes);
 app.use('/api/analytics', csrfProtection, analyticsRoutes);
 app.use('/api/users', csrfProtection, usersRoutes);
+app.use('/api/planner', csrfProtection, plannerRoutes);
+app.use('/api/gtfs', gtfsRoutes);
 app.use(errorHandler);

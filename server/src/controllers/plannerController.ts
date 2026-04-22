@@ -95,26 +95,30 @@ export async function getRouteOptions(req: Request, res: Response) {
       return res.status(503).json({ message: "Google Maps API key is not configured on server." });
     }
 
-    const { origin, destination, departureTime } = req.body as {
+    const { origin, destination, originPlaceId, destinationPlaceId, departureTime } = req.body as {
       origin: string;
       destination: string;
+      originPlaceId?: string;
+      destinationPlaceId?: string;
       departureTime?: string;
     };
+    const resolvedOrigin = originPlaceId ? `place_id:${originPlaceId}` : origin;
+    const resolvedDestination = destinationPlaceId ? `place_id:${destinationPlaceId}` : destination;
 
     const departDate = departureTime ? new Date(departureTime) : new Date();
     const departureUnix = Math.floor(departDate.getTime() / 1000);
 
     const transitUrl = new URL("https://maps.googleapis.com/maps/api/directions/json");
-    transitUrl.searchParams.set("origin", origin);
-    transitUrl.searchParams.set("destination", destination);
+    transitUrl.searchParams.set("origin", resolvedOrigin);
+    transitUrl.searchParams.set("destination", resolvedDestination);
     transitUrl.searchParams.set("mode", "transit");
     transitUrl.searchParams.set("alternatives", "true");
     transitUrl.searchParams.set("departure_time", String(departureUnix));
     transitUrl.searchParams.set("key", env.GOOGLE_MAPS_API_KEY);
 
     const drivingUrl = new URL("https://maps.googleapis.com/maps/api/directions/json");
-    drivingUrl.searchParams.set("origin", origin);
-    drivingUrl.searchParams.set("destination", destination);
+    drivingUrl.searchParams.set("origin", resolvedOrigin);
+    drivingUrl.searchParams.set("destination", resolvedDestination);
     drivingUrl.searchParams.set("mode", "driving");
     drivingUrl.searchParams.set("departure_time", "now");
     drivingUrl.searchParams.set("traffic_model", "best_guess");
@@ -133,7 +137,7 @@ export async function getRouteOptions(req: Request, res: Response) {
     const trafficSecs = Number(driveLeg?.duration_in_traffic?.value || baseSecs);
     const trafficIndex = trafficSecs / Math.max(baseSecs, 1);
 
-    const options = transitData.routes.slice(0, 3).map((route: any, idx: number) => {
+    const options = transitData.routes.map((route: any, idx: number) => {
       const leg = route.legs?.[0];
       const steps = Array.isArray(leg?.steps) ? leg.steps : [];
       const totalSecs = Number(leg?.duration?.value || 0);
@@ -161,25 +165,59 @@ export async function getRouteOptions(req: Request, res: Response) {
         return { mode: "Transfer", distanceKm: stepKm, label: stripHtml(step.html_instructions || step.duration?.text || "Transfer") };
       });
 
-      const fare = estimateFare(mappedLegs.map((l: any) => ({ mode: l.mode, distanceKm: l.distanceKm })));
+      const estimatedFare = estimateFare(mappedLegs.map((l: any) => ({ mode: l.mode, distanceKm: l.distanceKm })));
+      const actualTransitFare = Number(route?.fare?.value || 0);
+      const routeSignature = mappedLegs
+        .map((leg: any) => `${String(leg.mode).toLowerCase()}|${String(leg.label).toLowerCase()}`)
+        .join("||");
 
       return {
-        name: idx === 0 ? "Fast route" : idx === 1 ? "Balanced route" : "Alternate route",
-        cost: fare.total,
-        fareBreakdown: fare.breakdown,
+        id: `route-${idx}`,
+        cost: actualTransitFare > 0 ? actualTransitFare : estimatedFare.total,
+        fareBreakdown: estimatedFare.breakdown,
         minutes: Math.round(totalSecs / 60),
-        fastest: false,
         crowdLevel: getCrowdLevel(trafficIndex, departDate),
         peakWindow: getPeakWindow(departDate),
         avgSpeedKph,
         legs: mappedLegs.map((l: any) => ({ mode: l.mode, label: l.label })),
+        signature: routeSignature,
       };
     });
 
-    const fastestMinutes = Math.min(...options.map((o: any) => o.minutes));
-    const withFastest = options.map((o: any) => ({ ...o, fastest: o.minutes === fastestMinutes }));
+    const uniqueOptions = options.filter(
+      (option: any, index: number, all: any[]) =>
+        all.findIndex((candidate: any) => candidate.signature === option.signature) === index
+    );
 
-    return res.json({ options: withFastest });
+    if (uniqueOptions.length === 0) {
+      return res.status(404).json({ message: "No transit routes found for this trip." });
+    }
+
+    const minMinutes = Math.min(...uniqueOptions.map((o: any) => o.minutes));
+    const minCost = Math.min(...uniqueOptions.map((o: any) => o.cost));
+
+    const scoredOptions = uniqueOptions.map((o: any) => ({
+      ...o,
+      balanceScore: (o.minutes / minMinutes) + (o.cost / minCost)
+    }));
+
+    const fastest = scoredOptions.find((o: any) => o.minutes === minMinutes);
+    const tipidToken = scoredOptions.filter((o: any) => o.signature !== fastest?.signature).sort((a: any, b: any) => a.cost - b.cost)[0];
+    const balanceToken = scoredOptions
+      .filter((o: any) => o.signature !== fastest?.signature && o.signature !== tipidToken?.signature)
+      .sort((a: any, b: any) => a.balanceScore - b.balanceScore)[0];
+
+    const labelledCandidates = [
+      fastest ? { ...fastest, name: "Fastest Hero", tag: "fastest", label: "Pinakamabilis" } : null,
+      tipidToken ? { ...tipidToken, name: "Tipid Hero", tag: "tipid", label: "Pinakatipid" } : null,
+      balanceToken ? { ...balanceToken, name: "Balanced Hero", tag: "balance", label: "Sakto Lang" } : null,
+    ].filter(Boolean);
+
+    const finalOptions = labelledCandidates.length > 0
+      ? labelledCandidates
+      : [{ ...scoredOptions[0], name: "Best Available Hero", tag: "balance", label: "Best Available" }];
+
+    return res.json({ options: finalOptions });
   } catch (error) {
     console.error("Planner error:", error);
     return res.status(500).json({ message: "Failed to fetch route options." });

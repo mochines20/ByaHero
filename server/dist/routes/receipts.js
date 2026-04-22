@@ -8,7 +8,11 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
         const allowed = ["image/jpeg", "image/png", "image/webp"].includes(file.mimetype);
-        cb(allowed ? null : new Error("Invalid file type"), allowed);
+        if (!allowed) {
+            cb(new Error("Invalid file type"));
+            return;
+        }
+        cb(null, true);
     },
 });
 router.use(authMiddleware);

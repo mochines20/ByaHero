@@ -32,10 +32,13 @@ export async function uploadReceipt(req: Request, res: Response) {
 
 export async function deleteReceipt(req: Request, res: Response) {
   const user = (req as any).user;
-  const { id } = req.params;
+  const id = String(req.params.id ?? "");
 
-  const receipt = await prisma.receipt.findUnique({ where: { id }, include: { trip: true } });
-  if (!receipt || receipt.trip.userId !== user.id) return res.status(404).json({ message: "Receipt not found" });
+  const receipt = await prisma.receipt.findUnique({ where: { id } });
+  if (!receipt) return res.status(404).json({ message: "Receipt not found" });
+
+  const trip = await prisma.trip.findUnique({ where: { id: receipt.tripId } });
+  if (!trip || trip.userId !== user.id) return res.status(404).json({ message: "Receipt not found" });
 
   await cloudinary.uploader.destroy(receipt.cloudinaryId);
   await prisma.receipt.delete({ where: { id } });

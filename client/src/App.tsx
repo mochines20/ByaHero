@@ -27,14 +27,20 @@ import { CrowdPage } from "./pages/Crowd";
 import { OfflinePage } from "./pages/Offline";
 import { ComingSoonPage } from "./pages/ComingSoon";
 import { SettingsPage } from "./pages/Settings";
+import { useAuth } from "./hooks/useAuth";
 import { useAuthStore } from "./store/authStore";
 
-function ProtectedRoute({ children }: { children: JSX.Element }) {
+function ProtectedRoute({ children, loading }: { children: JSX.Element; loading: boolean }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  if (loading) {
+    return <SkeletonPage />;
+  }
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 export default function App() {
+  const { loading } = useAuth();
+
   return (
     <ErrorBoundary>
       <OfflineBanner />
@@ -49,7 +55,7 @@ export default function App() {
           <Route
             path="/*"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute loading={loading}>
                 <PageWrapper>
                   <Routes>
                     <Route path="dashboard" element={<DashboardPage />} />

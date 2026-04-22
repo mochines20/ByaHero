@@ -7,11 +7,38 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => setUser(res.data.user))
-      .catch(() => logout())
-      .finally(() => setLoading(false));
+    let active = true;
+
+    const restoreSession = async () => {
+      try {
+        const me = await api.get("/auth/me");
+        if (active) {
+          setUser(me.data.user);
+        }
+      } catch {
+        try {
+          await api.post("/auth/refresh");
+          const me = await api.get("/auth/me");
+          if (active) {
+            setUser(me.data.user);
+          }
+        } catch {
+          if (active) {
+            logout();
+          }
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      active = false;
+    };
   }, [logout, setUser]);
 
   return { user, isAuthenticated, loading };

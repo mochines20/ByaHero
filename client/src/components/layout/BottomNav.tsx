@@ -1,39 +1,52 @@
 import { NavLink } from "react-router-dom";
 import { Home, Route, ShieldAlert, User, Wallet } from "lucide-react";
+import { motion } from "framer-motion";
 
 const items = [
   { to: "/dashboard", label: "Home", icon: Home },
-  { to: "/expenses", label: "Expenses", icon: Wallet },
-  { to: "/planner", label: "Plan", icon: Route },
+  { to: "/expenses", label: "Wallet", icon: Wallet },
+  { to: "/planner", label: "Route", icon: Route },
   { to: "/emergency-contacts", label: "SOS", icon: ShieldAlert },
-  { to: "/settings", label: "Profile", icon: User },
+  { to: "/settings", label: "Ako", icon: User },
 ];
 
 export function BottomNav() {
   return (
-    <nav className="safe-pb fixed inset-x-0 bottom-2 z-40 mx-2 rounded-2xl border border-[#dceafd] bg-white/90 px-1 py-2 shadow-card backdrop-blur-xl md:hidden">
-      <ul className="grid grid-cols-5">
-        {items.map(({ to, label, icon: Icon }) => (
-          <li key={to} className="text-center">
-            <NavLink
-              to={to}
-              className={({ isActive }) =>
-                `mx-auto flex min-h-11 w-full max-w-[72px] flex-col items-center justify-center rounded-md text-[11px] ${
-                  isActive ? "text-[#30aef7]" : "text-byahero-muted"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon size={18} />
-                  <span>{label}</span>
-                  <span className={`mt-1 h-0.5 w-10 rounded-full ${isActive ? "bg-[#30aef7]" : "bg-transparent"}`} />
-                </>
-              )}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+    <nav className="fixed inset-x-4 bottom-6 z-40 lg:hidden">
+      <div className="glass-panel rounded-[2rem] px-2 py-3 border border-white/20 shadow-2xl">
+        <ul className="flex items-center justify-around">
+          {items.map(({ to, label, icon: Icon }) => (
+            <li key={to} className="relative">
+              <NavLink
+                to={to}
+                className={({ isActive }) =>
+                  `flex flex-col items-center justify-center p-2 transition-all duration-300 ${
+                    isActive ? "text-byahero-yellow" : "text-white/60"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon 
+                      size={20} 
+                      className={`mb-1 transition-transform ${isActive ? "scale-110 drop-shadow-[0_0_8px_rgba(255,214,10,0.5)]" : ""}`} 
+                    />
+                    <span className="text-[10px] font-black uppercase tracking-tighter">{label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute -bottom-1 h-1 w-1 rounded-full bg-byahero-yellow shadow-yellow"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 }
+

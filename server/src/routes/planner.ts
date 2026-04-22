@@ -9,6 +9,8 @@ const router = Router();
 const plannerSchema = z.object({
   origin: z.string().min(2),
   destination: z.string().min(2),
+  originPlaceId: z.string().min(5).optional(),
+  destinationPlaceId: z.string().min(5).optional(),
   departureTime: z.string().datetime().optional(),
 });
 

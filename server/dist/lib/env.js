@@ -1,12 +1,17 @@
 import dotenv from "dotenv";
+import path from "path";
 import { z } from "zod";
-dotenv.config();
+// When running via workspace from repo root, process.cwd() may be the root.
+// Load both root `.env` and `server/.env` (server one wins).
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), "server", ".env"), override: true });
 const envSchema = z.object({
     DATABASE_URL: z.string().min(1),
     JWT_SECRET: z.string().min(16),
     JWT_REFRESH_SECRET: z.string().min(16),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_MAPS_API_KEY: z.string().optional(),
     APPLE_CLIENT_ID: z.string().optional(),
     APPLE_TEAM_ID: z.string().optional(),
     APPLE_KEY_ID: z.string().optional(),

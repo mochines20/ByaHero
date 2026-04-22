@@ -1,54 +1,70 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Nunito", system-ui, sans-serif;
 }
 
 body {
-  @apply text-byahero-text;
-  background:
-    radial-gradient(circle at 15% 12%, rgba(126, 211, 255, 0.28), transparent 34%),
-    radial-gradient(circle at 85% 8%, rgba(255, 209, 128, 0.22), transparent 30%),
-    linear-gradient(180deg, #f4f9ff 0%, #eef5ff 100%);
+  @apply text-white font-sans;
+  background: 
+    linear-gradient(-45deg, #0A2463, #15317E, #1D4ED8, #0A2463);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
   min-height: 100vh;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
 }
 
-* {
-  @apply focus:outline-none;
+@layer utilities {
+  .animate-gradient-slow {
+    animation: gradient-shift 15s ease infinite;
+  }
 }
 
-:focus-visible {
-  outline: 2px solid #042C53;
-  outline-offset: 2px;
+/* Decorative Baybayin Backgrounds (Purely Decorative) */
+body::before {
+  content: "ᜊᜌᜑᜒᜇᜓ";
+  position: fixed;
+  top: 5%;
+  left: -5%;
+  font-size: 15vw;
+  font-family: serif;
+  color: rgba(255, 214, 10, 0.05);
+  pointer-events: none;
+  z-index: -1;
+  rotate: -15deg;
 }
 
-.safe-pb {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+body::after {
+  content: "ᜊᜌᜑᜒᜇᜓ";
+  position: fixed;
+  bottom: 0;
+  right: -5%;
+  font-size: 20vw;
+  font-family: serif;
+  color: rgba(255, 214, 10, 0.05);
+  pointer-events: none;
+  z-index: -1;
 }
 
-.page-enter {
-  animation: fadeIn 150ms ease;
-}
-
-.pwd {
-  font-size: 112%;
-}
-
-.pwd body {
-  letter-spacing: 0.2px;
-}
-
+/* Global Glassmorphism System */
 .glass-card {
-  @apply border border-[#dceafd] bg-white/80 shadow-card backdrop-blur-xl;
+  @apply border border-white/20 bg-white/10 shadow-2xl backdrop-blur-3xl;
 }
 
 .glass-panel {
-  @apply border border-[#deebfc] bg-white/70 backdrop-blur-2xl;
+  @apply border border-white/10 bg-white/5 shadow-2xl backdrop-blur-3xl;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Base Form Styles */
+input, select, textarea {
+  @apply bg-white/5 border-white/20 backdrop-blur-md transition-all duration-300 text-white placeholder:text-white/40;
 }
+
+input:focus {
+  @apply border-byahero-yellow bg-white/10 ring-4 ring-byahero-yellow/10;
+}
+

@@ -26,7 +26,7 @@ export async function createTrip(req, res) {
 }
 export async function updateTrip(req, res) {
     const user = req.user;
-    const { id } = req.params;
+    const id = String(req.params.id ?? "");
     const trip = await prisma.trip.updateMany({
         where: { id, userId: user.id },
         data: {
@@ -38,7 +38,7 @@ export async function updateTrip(req, res) {
 }
 export async function deleteTrip(req, res) {
     const user = req.user;
-    const { id } = req.params;
+    const id = String(req.params.id ?? "");
     await prisma.trip.deleteMany({ where: { id, userId: user.id } });
     return res.json({ message: "Deleted" });
 }

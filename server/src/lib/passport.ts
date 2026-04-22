@@ -12,7 +12,7 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
         clientSecret: env.GOOGLE_CLIENT_SECRET,
         callbackURL: `${env.CLIENT_URL.replace(":5173", ":4000")}/api/auth/google/callback`,
       },
-      async (_accessToken, _refreshToken, profile, done) => {
+      async (_accessToken: string, _refreshToken: string, profile: any, done: any) => {
         try {
           const email = profile.emails?.[0]?.value;
           if (!email) return done(new Error("Google email unavailable"));
